@@ -51,7 +51,7 @@
             </div>
             <div class="auth">
               <div class="avatars">
-                <NAvatar round :size="40" color="#e8e8e8" />
+                <NAvatar round :size="40" color="#f3f4f5" />
                 <div class="dash">
                   <div
                     class="indicator"
@@ -62,7 +62,7 @@
                     </NIcon>
                   </div>
                 </div>
-                <NAvatar round :size="40" color="#e8e8e8" :src="NaiveLogo" />
+                <NAvatar round :size="40" color="#fff" :src="NaiveLogo" />
               </div>
               <div class="desc select-none">您拥有该应用的访问权限</div>
             </div>
