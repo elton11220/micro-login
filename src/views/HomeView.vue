@@ -2,7 +2,7 @@
   <div class="container">
     <div class="aside">
       <div class="header">
-        <img :src="NaiveLogo">
+        <img :src="NaiveLogo" />
         <div>#Company Name#</div>
       </div>
       <div class="slogan">#Company Slogan#</div>
@@ -14,28 +14,47 @@
           <div class="content">
             <div class="infos">
               <div class="info">
-                <div class="icon">1</div>
+                <div class="icon">
+                  <NIcon color="#ccc" size="40">
+                    <AppFolder24Regular />
+                  </NIcon>
+                </div>
                 <div class="detail">
                   <div class="name">授权登录的应用</div>
                   <div class="value">内网管理系统</div>
                 </div>
               </div>
               <div class="info">
-                <div class="icon">1</div>
+                <div class="icon">
+                  <NIcon color="#ccc" size="40">
+                    <NumberSymbolSquare20Filled />
+                  </NIcon>
+                </div>
                 <div class="detail">
                   <div class="name">授权应用唯一标识符</div>
                   <div class="value">com.yjh.managesystem</div>
                 </div>
               </div>
               <div class="info">
-                <div class="icon">1</div>
+                <div class="icon">
+                  <NIcon color="#ccc" size="34">
+                    <AppsListDetail24Regular />
+                  </NIcon>
+                </div>
                 <div class="detail">
                   <div class="name">应用描述</div>
-                  <div class="value">用于管理企业内网系统用户、角色、权限，人事管理等功能</div>
+                  <div class="value">
+                    用于管理企业内网系统用户、角色、权限，人事管理等功能
+                  </div>
                 </div>
               </div>
             </div>
-            <button class="btn-container">单点登录</button>
+            <button class="btn-container">
+              <NIcon color="#fff" size="18">
+                <ShieldLock16Filled />
+              </NIcon>
+              <span>单点登录</span>
+            </button>
           </div>
         </div>
       </div>
@@ -46,6 +65,13 @@
 <script lang="ts" setup>
 // @ts-ignore
 import NaiveLogo from "@/assets/naiveLogo.svg";
+import { NIcon } from "naive-ui";
+import {
+  ShieldLock16Filled,
+  AppFolder24Regular,
+  AppsListDetail24Regular,
+  NumberSymbolSquare20Filled,
+} from "@vicons/fluent";
 </script>
 
 <style lang="scss" scoped>
@@ -76,7 +102,7 @@ import NaiveLogo from "@/assets/naiveLogo.svg";
     .slogan {
       padding: 12px 0 40px 0;
       font-size: 12px;
-      color: rgba(0,0,0,.65);
+      color: rgba(0, 0, 0, 0.65);
     }
     .tab {
       width: 328px;
