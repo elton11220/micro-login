@@ -58,6 +58,7 @@
           </div>
         </div>
       </div>
+      <div class="footer">本系统使用qiankun微前端技术构建</div>
     </div>
   </div>
 </template>
@@ -89,6 +90,7 @@ import {
     flex-direction: column;
     align-items: center;
     padding: 32px 0;
+    position: relative;
     .header {
       display: flex;
       align-items: center;
@@ -170,6 +172,18 @@ import {
           }
         }
       }
+    }
+    > .footer {
+      position: absolute;
+      width: 100%;
+      height: 80px;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #9e9e9e;
+      font-size: 12px;
     }
   }
 }
