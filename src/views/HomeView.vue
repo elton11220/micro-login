@@ -49,6 +49,23 @@
                 </div>
               </div>
             </div>
+            <div class="auth">
+              <div class="avatars">
+                <NAvatar round :size="40" color="#e8e8e8" />
+                <div class="dash">
+                  <div
+                    class="indicator"
+                    :style="{ backgroundColor: '#27c346' }"
+                  >
+                    <NIcon color="#fff" size="13">
+                      <Checkmark12Regular />
+                    </NIcon>
+                  </div>
+                </div>
+                <NAvatar round :size="40" color="#e8e8e8" :src="NaiveLogo" />
+              </div>
+              <div class="desc select-none">您拥有该应用的访问权限</div>
+            </div>
             <button class="btn-container">
               <NIcon color="#fff" size="18">
                 <ShieldLock16Filled />
@@ -66,12 +83,13 @@
 <script lang="ts" setup>
 // @ts-ignore
 import NaiveLogo from "@/assets/naiveLogo.svg";
-import { NIcon } from "naive-ui";
+import { NIcon, NAvatar } from "naive-ui";
 import {
   ShieldLock16Filled,
   AppFolder24Regular,
   AppsListDetail24Regular,
   NumberSymbolSquare20Filled,
+  Checkmark12Regular,
 } from "@vicons/fluent";
 </script>
 
@@ -169,6 +187,41 @@ import {
                 white-space: nowrap;
               }
             }
+          }
+        }
+        > .auth {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 5px;
+          > .avatars {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            > .dash {
+              width: 90px;
+              border-bottom: 2px dashed #d8d8d8;
+              position: relative;
+              > .indicator {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate3d(-50%, -50%, 0);
+                border-radius: 50%;
+                width: 15px;
+                height: 15px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+              }
+            }
+          }
+          > .desc {
+            padding: 10px;
+            color: #9e9e9e;
+            font-size: 12px;
+            text-align: center;
           }
         }
       }
