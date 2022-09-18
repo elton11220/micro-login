@@ -1,24 +1,37 @@
-# micro-login
+## Introduction
 
-## Project setup
-```
-yarn install
+A general login and authorization service developed with Vue3+TypeScript+qiankun micro front-end to provide the login page and single sign on callback page as the sub application of qiankun micro front-end
+
+gitee (faster in China Mainland): [https://gitee.com/elton11220/micro-login](https://gitee.com/elton11220/micro-login)
+
+Github: [https://github.com/elton11220/micro-login](https://github.com/elton11220/micro-login)
+
+`Vue3 + TypeScript + qiankun`
+
+## Installation
+
+Clone the repo and install dependencies:
+
+```shell
+git clone _repoUrl_ your-project-name
+cd your-project-name
+yarn
 ```
 
-### Compiles and hot-reloads for development
-```
+## Starting Development
+
+Start the app in the dev environment:
+
+```shell
 yarn serve
 ```
 
-### Compiles and minifies for production
-```
+## Packaging for Production
+
+To package for production:
+
+```shell
 yarn build
 ```
 
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+> When running in production mode, this application can only exist in the form of micro front terminal application and cannot be accessed independently
