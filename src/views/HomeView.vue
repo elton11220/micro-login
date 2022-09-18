@@ -100,14 +100,18 @@
                 currentState !== CurrentState.callback &&
                 currentState !== CurrentState.gotSt
               "
+              :disabled="loginBtnLoading"
             >
               <NIcon
                 color="#fff"
                 size="18"
-                v-if="currentState === CurrentState.unauthorized"
+                v-if="
+                  currentState === CurrentState.unauthorized && !loginBtnLoading
+                "
               >
                 <ShieldLock16Filled />
               </NIcon>
+              <NSpin v-if="loginBtnLoading" :size="14" stroke="#fff" />
               <span>{{ LoginBtnTitle[currentState] }}</span>
             </button>
           </div>
@@ -173,6 +177,8 @@ const message = useMessage();
 const currentState = ref<CurrentState>(CurrentState.unauthorized);
 
 const basicUserInfo = ref<BasicUserInfo | null>(null);
+
+const loginBtnLoading = ref<boolean>(false);
 
 onMounted(() => {
   const localSt = window.localStorage.getItem("st");
@@ -240,6 +246,7 @@ const validateSt = (st: string, appId: string) => {
 };
 
 const login = (st: string, appId: string, target: string) => {
+  loginBtnLoading.value = true;
   fetch(`${ssoServer}/auth/login`, {
     method: "POST",
     headers: {
@@ -278,6 +285,9 @@ const login = (st: string, appId: string, target: string) => {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      loginBtnLoading.value = false;
     });
 };
 
