@@ -49,28 +49,66 @@
                 </div>
               </div>
             </div>
-            <div class="auth">
+            <div class="auth" v-if="currentState !== CurrentState.unauthorized">
               <div class="avatars">
-                <NAvatar round :size="40" color="#f3f4f5" />
-                <div class="dash">
-                  <div
-                    class="indicator"
-                    :style="{ backgroundColor: '#27c346' }"
-                  >
-                    <NIcon color="#fff" size="13">
-                      <Checkmark12Regular />
-                    </NIcon>
+                <NSpin
+                  :size="15"
+                  stroke="#aaa"
+                  v-if="currentState === CurrentState.gotSt"
+                />
+                <template v-else>
+                  <NAvatar
+                    round
+                    :size="40"
+                    color="#f3f4f5"
+                    :src="basicUserInfo?.avatarUrl || ''"
+                  />
+                  <div class="dash">
+                    <div
+                      class="indicator"
+                      :style="{
+                        backgroundColor:
+                          currentState === CurrentState.authorized
+                            ? '#27c346'
+                            : currentState === CurrentState.forbidden
+                            ? '#f76965'
+                            : '#eee',
+                      }"
+                    >
+                      <NSpin
+                        v-if="currentState === CurrentState.callback"
+                        :size="10"
+                        stroke="#aaa"
+                        :stroke-width="40"
+                      />
+                      <NIcon color="#fff" size="13" v-else>
+                        <Checkmark12Regular />
+                      </NIcon>
+                    </div>
                   </div>
-                </div>
-                <NAvatar round :size="40" color="#fff" :src="NaiveLogo" />
+                  <NAvatar round :size="40" color="#fff" :src="NaiveLogo" />
+                </template>
               </div>
-              <div class="desc select-none">您拥有该应用的访问权限</div>
+              <div class="desc select-none">
+                {{ AuthResultTitle[currentState] }}
+              </div>
             </div>
-            <button class="btn-container">
-              <NIcon color="#fff" size="18">
+            <button
+              class="btn-container"
+              @click="btnLoginClick"
+              v-if="
+                currentState !== CurrentState.callback &&
+                currentState !== CurrentState.gotSt
+              "
+            >
+              <NIcon
+                color="#fff"
+                size="18"
+                v-if="currentState === CurrentState.unauthorized"
+              >
                 <ShieldLock16Filled />
               </NIcon>
-              <span>单点登录</span>
+              <span>{{ LoginBtnTitle[currentState] }}</span>
             </button>
           </div>
         </div>
@@ -83,7 +121,7 @@
 <script lang="ts" setup>
 // @ts-ignore
 import NaiveLogo from "@/assets/naiveLogo.svg";
-import { NIcon, NAvatar } from "naive-ui";
+import { NIcon, NAvatar, NSpin, useMessage } from "naive-ui";
 import {
   ShieldLock16Filled,
   AppFolder24Regular,
@@ -91,6 +129,184 @@ import {
   NumberSymbolSquare20Filled,
   Checkmark12Regular,
 } from "@vicons/fluent";
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ssoServer, ssoClient, stMaxAge } from "@/utils/constants";
+
+enum CurrentState {
+  unauthorized,
+  authorized,
+  forbidden,
+  callback,
+  gotSt,
+}
+
+enum LoginBtnTitle {
+  "单点登录",
+  "登录",
+  "切换账号",
+  "请稍候",
+  "",
+}
+
+enum AuthResultTitle {
+  "",
+  "您拥有该应用的访问权限",
+  "您没有该应用的访问权限",
+  "正在检查访问权限，请稍候",
+  "正在验证登录信息，请稍候",
+}
+
+interface BasicUserInfo {
+  identifier: string;
+  nickname: string;
+  lastLoginAt: string;
+  lastLoginIp: string;
+  avatarUrl: string;
+  roles: string[];
+}
+
+const route = useRoute();
+const router = useRouter();
+const message = useMessage();
+
+const currentState = ref<CurrentState>(CurrentState.unauthorized);
+
+const basicUserInfo = ref<BasicUserInfo | null>(null);
+
+onMounted(() => {
+  const localSt = window.localStorage.getItem("st");
+  const localStExpires = window.localStorage.getItem("stExpires");
+  const localBasicUserInfoRaw = window.localStorage.getItem("basicUserInfo");
+  const now = new Date().getTime();
+  if (route.query.st && route.query.target) {
+    currentState.value = CurrentState.callback;
+    const { protocol, host, pathname } = window.location;
+    const { st, target } = route.query;
+    const currentHost = `${protocol}//${host}${pathname}`;
+    if (currentHost === decodeURIComponent(target as string)) {
+      // 从登录页手动登录，不自动获取token
+      currentState.value = CurrentState.gotSt;
+      validateSt(st as string, "com.yjh.managesystem");
+    } else {
+      // 从其他页面直接登录并携带st和target访问/login，自动登录
+      login(st as string, "com.yjh.managesystem", target as string);
+    }
+  } else if (
+    localSt &&
+    localStExpires &&
+    localBasicUserInfoRaw &&
+    now + 1000 * 20 < Number.parseInt(localStExpires)
+  ) {
+    // 本地存在ST且非回调页面
+    basicUserInfo.value = JSON.parse(localBasicUserInfoRaw);
+    validateSt(localSt, "com.yjh.managesystem");
+    currentState.value = CurrentState.authorized;
+  }
+});
+
+const validateSt = (st: string, appId: string) => {
+  fetch(`${ssoServer}/auth/validateSt`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      st,
+      appId: "com.yjh.managesystem",
+    }),
+  })
+    .then((res) => res.json())
+    .then((json) => {
+      if (json.code === 200) {
+        basicUserInfo.value = json.data;
+        window.localStorage.setItem("basicUserInfo", JSON.stringify(json.data));
+        window.localStorage.setItem("st", st as string);
+        window.localStorage.setItem(
+          "stExpires",
+          (new Date().getTime() + stMaxAge).toString()
+        );
+        currentState.value = CurrentState.authorized;
+      } else {
+        message.error(json.msg);
+        currentState.value = CurrentState.unauthorized;
+        window.localStorage.clear();
+        router.replace("/");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const login = (st: string, appId: string, target: string) => {
+  fetch(`${ssoServer}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    referrer: window.location.href,
+    referrerPolicy: "unsafe-url",
+    body: JSON.stringify({
+      st,
+      appId,
+    }),
+  })
+    .then((res) => res.json())
+    .then((json) => {
+      if (json.code === 200) {
+        message.success("登录成功");
+        window.localStorage.clear();
+        window.localStorage.setItem("token", json.data.token);
+        const basicUserInfo = { ...json.data };
+        delete basicUserInfo.token;
+        window.localStorage.setItem(
+          "basicUserInfo",
+          JSON.stringify(basicUserInfo)
+        );
+        window.location.replace(target);
+      } else if (json.code === 403) {
+        currentState.value = CurrentState.forbidden;
+        message.error(json.msg);
+        router.replace("/");
+      } else {
+        message.error("请重新登录");
+        currentState.value = CurrentState.unauthorized;
+        window.localStorage.clear();
+        router.replace("/");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const btnLoginClick = () => {
+  if (currentState.value === CurrentState.unauthorized) {
+    window.location.href = `${ssoClient}/?redirect=${encodeURIComponent(
+      window.location.href
+    )}`;
+  } else if (currentState.value === CurrentState.authorized) {
+    const st = window.localStorage.getItem("st");
+    const stExpires = window.localStorage.getItem("stExpires");
+    const now = new Date().getTime();
+    if (st && stExpires && now < Number.parseInt(stExpires) - 1000 * 10) {
+      // st有效，进行登录并返回到首页
+      const { protocol, host } = window.location;
+      login(st, "com.yjh.managesystem", `${protocol}//${host}`);
+    } else {
+      // st过期或将要过期
+      currentState.value = CurrentState.unauthorized;
+      message.warning("登录已失效");
+      window.localStorage.clear();
+      router.replace("/");
+    }
+  } else if (currentState.value === CurrentState.forbidden) {
+    window.location.href = `${ssoClient}/logout?redirect=${encodeURIComponent(
+      window.location.href
+    )}`;
+  }
+};
 </script>
 
 <style lang="scss" scoped>

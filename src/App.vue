@@ -1,6 +1,12 @@
 <template>
-  <router-view />
+  <NMessageProvider>
+    <router-view />
+  </NMessageProvider>
 </template>
+
+<script setup>
+import { NMessageProvider } from "naive-ui";
+</script>
 
 <style lang="scss">
 * {
