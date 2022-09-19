@@ -26,6 +26,19 @@ yarn
 yarn serve
 ```
 
+## qiankun微前端
+
+本应用需要注册到其他使用qiankun微前端的主应用，不支持独立访问
+
+需要在主应用根组件的mounted钩子函数(onMounted, useEffect)中注入qiankun全局状态：
+```TypeScript
+interface MicroAppState {
+  appId: string; // 需要在主应用中配置固定值，在加载根组件挂载时传递
+  appName?: string; // 可以从网络获取并异步传入，建议使用缓存值
+  appDescription?: string; // 可以从网络获取并异步传入，建议使用缓存值
+}
+```
+
 ## 打包项目
 
 打包项目用于生产环境：

@@ -26,6 +26,19 @@ Start the app in the dev environment:
 yarn serve
 ```
 
+## qiankun micro-frontend
+
+This application needs to be registered in the main application which uses 'qiankun', and does not support independent access
+
+You need to inject the qiankun global state in the mounted hook(onMounted, useEffect) of the root component of the main application:
+```TypeScript
+interface MicroAppState {
+  appId: string; // Fixed values need to be configured in the main application and passed while the root component is mounted
+  appName?: string; // It can be obtained from the network and transferred asynchronously. It is recommended to use the cache value
+  appDescription?: string; // It can be obtained from the network and transferred asynchronously. It is recommended to use the cache value
+}
+```
+
 ## Packaging for Production
 
 To package for production:
