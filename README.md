@@ -39,6 +39,8 @@ interface MicroAppState {
 }
 ```
 
+> According to [qiankun 3.0 Roadmap - BreakChanges](https://github.com/umijs/qiankun/discussions/1378)：`globalState API` will be removed. Consider providing a compatible alternative version later
+
 ## Packaging for Production
 
 To package for production:
