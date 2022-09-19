@@ -21,7 +21,16 @@
                 </div>
                 <div class="detail">
                   <div class="name">授权登录的应用</div>
-                  <div class="value">内网管理系统</div>
+                  <div class="value" v-if="globalState?.appName">
+                    {{ globalState?.appName }}
+                  </div>
+                  <n-skeleton
+                    text
+                    :width="80"
+                    :height="14"
+                    :sharp="false"
+                    v-else
+                  />
                 </div>
               </div>
               <div class="info">
@@ -32,7 +41,16 @@
                 </div>
                 <div class="detail">
                   <div class="name">授权应用唯一标识符</div>
-                  <div class="value">com.yjh.managesystem</div>
+                  <div class="value" v-if="globalState?.appId">
+                    {{ globalState?.appId }}
+                  </div>
+                  <n-skeleton
+                    text
+                    :width="140"
+                    :height="14"
+                    :sharp="false"
+                    v-else
+                  />
                 </div>
               </div>
               <div class="info">
@@ -43,9 +61,10 @@
                 </div>
                 <div class="detail">
                   <div class="name">应用描述</div>
-                  <div class="value">
-                    用于管理企业内网系统用户、角色、权限，人事管理等功能
+                  <div class="value" v-if="globalState?.appDescription">
+                    {{ globalState?.appDescription }}
                   </div>
+                  <n-skeleton text :height="14" :sharp="false" v-else />
                 </div>
               </div>
             </div>
@@ -100,7 +119,7 @@
                 currentState !== CurrentState.callback &&
                 currentState !== CurrentState.gotSt
               "
-              :disabled="loginBtnLoading"
+              :disabled="isAppInfoLoaded || loginBtnLoading"
             >
               <NIcon
                 color="#fff"
@@ -125,7 +144,7 @@
 <script lang="ts" setup>
 // @ts-ignore
 import NaiveLogo from "@/assets/naiveLogo.svg";
-import { NIcon, NAvatar, NSpin, useMessage } from "naive-ui";
+import { NIcon, NAvatar, NSpin, useMessage, NSkeleton } from "naive-ui";
 import {
   ShieldLock16Filled,
   AppFolder24Regular,
@@ -133,7 +152,7 @@ import {
   NumberSymbolSquare20Filled,
   Checkmark12Regular,
 } from "@vicons/fluent";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ssoServer, ssoClient, stMaxAge } from "@/utils/constants";
 
@@ -179,6 +198,21 @@ const currentState = ref<CurrentState>(CurrentState.unauthorized);
 const basicUserInfo = ref<BasicUserInfo | null>(null);
 
 const loginBtnLoading = ref<boolean>(false);
+
+const globalState = inject<{
+  appName: string;
+  appId: string;
+  appDescription: string;
+}>("globalState");
+
+const isAppInfoLoaded = computed<boolean>(
+  () =>
+    (globalState &&
+      globalState?.appName !== "" &&
+      globalState?.appId !== "" &&
+      globalState?.appDescription !== "") ||
+    false
+);
 
 onMounted(() => {
   const localSt = window.localStorage.getItem("st");
