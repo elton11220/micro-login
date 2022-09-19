@@ -10,6 +10,11 @@ let router = null;
 let app = null;
 let history = null;
 function render(props = {}) {
+  if (process.env.NODE_ENV === "development") {
+    console.warn(
+      "[22.09.19] 开发环境警告：GlobalState API在qiankun 3.0版本中将会被移除\n后期版本考虑使用新的兼容方法替代"
+    );
+  }
   if (props) {
     microAppStateActions.setActions(props);
   }
@@ -39,11 +44,10 @@ if (!window.__POWERED_BY_QIANKUN__) {
 }
 
 export async function bootstrap() {
-  console.log("微应用加载");
+  //
 }
 
 export async function mount(props: any) {
-  console.log("props", props);
   render(props);
 }
 
