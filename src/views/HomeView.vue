@@ -523,5 +523,8 @@ const btnLoginClick = () => {
     transition: background-color 0.1s ease;
     background-color: #1d4dd2;
   }
+  &:disabled {
+    background-color: #93beff;
+  }
 }
 </style>
