@@ -215,6 +215,10 @@ const isAppInfoLoaded = computed<boolean>(
 );
 
 onMounted(() => {
+  if (!globalState?.appId) {
+    message.error("子应用加载失败");
+    return;
+  }
   const localSt = window.localStorage.getItem("st");
   const localStExpires = window.localStorage.getItem("stExpires");
   const localBasicUserInfoRaw = window.localStorage.getItem("basicUserInfo");
@@ -227,10 +231,10 @@ onMounted(() => {
     if (currentHost === decodeURIComponent(target as string)) {
       // 从登录页手动登录，不自动获取token
       currentState.value = CurrentState.gotSt;
-      validateSt(st as string, "com.yjh.managesystem");
+      validateSt(st as string, globalState?.appId ?? "");
     } else {
       // 从其他页面直接登录并携带st和target访问/login，自动登录
-      login(st as string, "com.yjh.managesystem", target as string);
+      login(st as string, globalState?.appId ?? "", target as string);
     }
   } else if (
     localSt &&
@@ -240,7 +244,7 @@ onMounted(() => {
   ) {
     // 本地存在ST且非回调页面
     basicUserInfo.value = JSON.parse(localBasicUserInfoRaw);
-    validateSt(localSt, "com.yjh.managesystem");
+    validateSt(localSt, globalState?.appId ?? "");
     currentState.value = CurrentState.authorized;
   }
 });
@@ -253,7 +257,7 @@ const validateSt = (st: string, appId: string) => {
     },
     body: JSON.stringify({
       st,
-      appId: "com.yjh.managesystem",
+      appId,
     }),
   })
     .then((res) => res.json())
@@ -337,7 +341,7 @@ const btnLoginClick = () => {
     if (st && stExpires && now < Number.parseInt(stExpires) - 1000 * 10) {
       // st有效，进行登录并返回到首页
       const { protocol, host } = window.location;
-      login(st, "com.yjh.managesystem", `${protocol}//${host}`);
+      login(st, globalState?.appId ?? "", `${protocol}//${host}`);
     } else {
       // st过期或将要过期
       currentState.value = CurrentState.unauthorized;
