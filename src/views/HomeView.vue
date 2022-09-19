@@ -119,7 +119,7 @@
                 currentState !== CurrentState.callback &&
                 currentState !== CurrentState.gotSt
               "
-              :disabled="isAppInfoLoaded || loginBtnLoading"
+              :disabled="!isAppInfoLoaded || loginBtnLoading"
             >
               <NIcon
                 color="#fff"

@@ -7,9 +7,9 @@
 <script lang="ts" setup>
 import { NMessageProvider } from "naive-ui";
 import { microAppStateActions } from "./microAppStateActions";
-import { onMounted, provide, ref } from "vue";
+import { onMounted, provide, reactive } from "vue";
 
-const globalState = ref({
+const globalState = reactive({
   appName: "",
   appId: "",
   appDescription: "",
@@ -21,22 +21,19 @@ onMounted(() => {
   microAppStateActions.onGlobalStateChange((state, prev) => {
     if (
       state.appName &&
-      (state.appName !== prev.appName || !globalState.value.appName)
+      (state.appName !== prev.appName || !globalState.appName)
     ) {
-      globalState.value.appName = state.appName;
+      globalState.appName = state.appName;
     }
-    if (
-      state.appId &&
-      (state.appId !== prev.appId || !globalState.value.appId)
-    ) {
-      globalState.value.appId = state.appId;
+    if (state.appId && (state.appId !== prev.appId || !globalState.appId)) {
+      globalState.appId = state.appId;
     }
     if (
       state.appDescription &&
       (state.appDescription !== prev.appDescription ||
-        !globalState.value.appDescription)
+        !globalState.appDescription)
     ) {
-      globalState.value.appDescription = state.appDescription;
+      globalState.appDescription = state.appDescription;
     }
   }, true);
 });
