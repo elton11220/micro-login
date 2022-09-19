@@ -278,8 +278,8 @@ const validateSt = (st: string, appId: string) => {
         router.replace("/");
       }
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
+      message.error("请求失败");
     });
 };
 
@@ -321,8 +321,8 @@ const login = (st: string, appId: string, target: string) => {
         router.replace("/");
       }
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
+      message.error("请求失败");
     })
     .finally(() => {
       loginBtnLoading.value = false;
