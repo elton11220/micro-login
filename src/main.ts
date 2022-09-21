@@ -53,8 +53,7 @@ export async function mount(props: any) {
 
 export async function unmount() {
   // @ts-ignore
-  app.unmount();
-  history = null;
   app = null;
+  history = null;
   router = null;
 }
