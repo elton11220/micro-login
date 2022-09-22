@@ -21,8 +21,8 @@
                 </div>
                 <div class="detail">
                   <div class="name">授权登录的应用</div>
-                  <div class="value" v-if="globalState?.appName">
-                    {{ globalState?.appName }}
+                  <div class="value" v-if="appInfo.appName">
+                    {{ appInfo.appName }}
                   </div>
                   <n-skeleton
                     text
@@ -41,8 +41,8 @@
                 </div>
                 <div class="detail">
                   <div class="name">授权应用唯一标识符</div>
-                  <div class="value" v-if="globalState?.appId">
-                    {{ globalState?.appId }}
+                  <div class="value" v-if="appInfo.appId">
+                    {{ appInfo.appId }}
                   </div>
                   <n-skeleton
                     text
@@ -61,8 +61,8 @@
                 </div>
                 <div class="detail">
                   <div class="name">应用描述</div>
-                  <div class="value" v-if="globalState?.appDescription">
-                    {{ globalState?.appDescription }}
+                  <div class="value" v-if="appInfo.appDescription">
+                    {{ appInfo.appDescription }}
                   </div>
                   <n-skeleton text :height="14" :sharp="false" v-else />
                 </div>
@@ -152,9 +152,10 @@ import {
   NumberSymbolSquare20Filled,
   Checkmark12Regular,
 } from "@vicons/fluent";
-import { ref, onMounted, inject, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ssoServer, ssoClient, stMaxAge } from "@/utils/constants";
+import { globalAppInfo } from "@/globalAppInfo";
 
 enum CurrentState {
   unauthorized,
@@ -199,26 +200,32 @@ const basicUserInfo = ref<BasicUserInfo | null>(null);
 
 const loginBtnLoading = ref<boolean>(false);
 
-const globalState = inject<{
-  appName: string;
-  appId: string;
-  appDescription: string;
-}>("globalState");
+const appInfo = ref({
+  appId: "",
+  appName: "",
+  appDescription: "",
+});
 
 const isAppInfoLoaded = computed<boolean>(
   () =>
-    (globalState &&
-      globalState?.appName !== "" &&
-      globalState?.appId !== "" &&
-      globalState?.appDescription !== "") ||
-    false
+    appInfo.value.appName !== "" &&
+    appInfo.value.appId !== "" &&
+    appInfo.value.appDescription !== ""
 );
 
 onMounted(() => {
-  if (!globalState?.appId) {
+  // 初始化AppInfo
+  const initialAppInfo = globalAppInfo.getAppInfo();
+  if (
+    !initialAppInfo.appId ||
+    !initialAppInfo.appName ||
+    !initialAppInfo.appDescription
+  ) {
     message.error("子应用加载失败");
     return;
   }
+  appInfo.value = initialAppInfo;
+  //
   const localSt = window.localStorage.getItem("st");
   const localStExpires = window.localStorage.getItem("stExpires");
   const localBasicUserInfoRaw = window.localStorage.getItem("basicUserInfo");
@@ -231,10 +238,10 @@ onMounted(() => {
     if (currentHost === decodeURIComponent(target as string)) {
       // 从登录页手动登录，不自动获取token
       currentState.value = CurrentState.gotSt;
-      validateSt(st as string, globalState?.appId ?? "");
+      validateSt(st as string, appInfo.value.appId ?? "");
     } else {
       // 从其他页面直接登录并携带st和target访问/login，自动登录
-      login(st as string, globalState?.appId ?? "", target as string);
+      login(st as string, appInfo.value.appId ?? "", target as string);
     }
   } else if (
     localSt &&
@@ -244,7 +251,7 @@ onMounted(() => {
   ) {
     // 本地存在ST且非回调页面
     basicUserInfo.value = JSON.parse(localBasicUserInfoRaw);
-    validateSt(localSt, globalState?.appId ?? "");
+    validateSt(localSt, appInfo.value.appId ?? "");
     currentState.value = CurrentState.authorized;
   }
 });
@@ -341,7 +348,7 @@ const btnLoginClick = () => {
     if (st && stExpires && now < Number.parseInt(stExpires) - 1000 * 10) {
       // st有效，进行登录并返回到首页
       const { protocol, host } = window.location;
-      login(st, globalState?.appId ?? "", `${protocol}//${host}`);
+      login(st, appInfo.value.appId ?? "", `${protocol}//${host}`);
     } else {
       // st过期或将要过期
       currentState.value = CurrentState.unauthorized;
