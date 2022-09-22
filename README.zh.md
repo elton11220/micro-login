@@ -39,7 +39,8 @@ interface MicroAppState {
 }
 ```
 
-> 根据 [qiankun 3.0 Roadmap - BreakChanges](https://github.com/umijs/qiankun/discussions/1378)：`globalState API` 将会被移除，后续考虑提供兼容的替代版本
+> ~~根据 [qiankun 3.0 Roadmap - BreakChanges](https://github.com/umijs/qiankun/discussions/1378)：`globalState API` 将会被移除，后续考虑提供兼容的替代版本~~
+<br/>该问题在 [commit-d861af9](https://gitee.com/elton11220/micro-login/commit/d861af93d6fe371bbf3954a95aba677d88fa3d28) 中得到了修复
 
 ## 打包项目
 
