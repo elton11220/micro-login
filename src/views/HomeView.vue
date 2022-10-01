@@ -181,13 +181,27 @@ enum AuthResultTitle {
   "正在验证登录信息，请稍候",
 }
 
+enum AccountStatus {
+  normal,
+  deactivate,
+  blocked,
+}
+
 interface BasicUserInfo {
   identifier: string;
   nickname: string;
   lastLoginAt: string;
   lastLoginIp: string;
   avatarUrl: string;
-  roles: string[];
+  roles: Array<{
+    roleId: string;
+    roleName: string;
+  }>;
+  permissions: Array<{
+    permissionId: string;
+    permissionName: string;
+  }>;
+  status: AccountStatus;
 }
 
 const route = useRoute();
